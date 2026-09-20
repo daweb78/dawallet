@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>dawallet Portfolio OS</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--bg:#f4f7f5;--card:#fff;--ink:#17221e;--muted:#72817a;--line:#e2ebe6;--g:#15956b;--g2:#35a77e;--dark:#123a2d;--red:#cf5b64;--amber:#e0a02b;--shadow:0 14px 38px rgba(18,58,45,.08);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root:not([data-theme="light"]){}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#0f1613;--card:#17211c;--ink:#eef3ef;--muted:#93a49b;--line:#26332c;--dark:#0b201a;--shadow:0 14px 38px rgba(0,0,0,.35)}
+}
+:root[data-theme="dark"]{--bg:#0f1613;--card:#17211c;--ink:#eef3ef;--muted:#93a49b;--line:#26332c;--dark:#0b201a;--shadow:0 14px 38px rgba(0,0,0,.35)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+.pl-pos{color:var(--g)}.pl-neg{color:var(--red)}
+.hero-card .pl-pos{color:#a8f2cf}.hero-card .pl-neg{color:#ffc4c9}.hero-card .muted{color:rgba(255,255,255,.75)}
+.amt.masked{filter:blur(6px);user-select:none}
+.divbar{position:relative;height:9px;background:#edf2ef;border-radius:99px;overflow:hidden}
+.divbar i{position:absolute;top:0;bottom:0;border-radius:99px}
+.pl-row{display:grid;grid-template-columns:150px 1fr 110px;gap:12px;align-items:center;margin:13px 0}
+.pl-row .lbl{font-size:13px;font-weight:650}
+.pl-row .val{text-align:right;font-weight:750;font-variant-numeric:tabular-nums}
+.pl-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px}
+.pl-summary div{background:#fbfdfc;border:1px solid var(--line);border-radius:15px;padding:14px}
+.pl-summary small{color:var(--muted);display:block;margin-bottom:5px}
+.pl-summary strong{font-size:19px}
+.eye-btn{font-size:15px}
+.total-row{display:flex;align-items:center;gap:12px;margin:4px 0 15px}
+.total-row .total{margin:0;padding-right:20px}
+.eye-icon-btn{width:34px;height:34px;flex:0 0 auto;border:none;background:rgba(255,255,255,.16);border-radius:50%;cursor:pointer;display:grid;place-items:center;transition:background .15s}
+.eye-icon-btn:hover{background:rgba(255,255,255,.28)}
+.eye-icon-btn svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:var(--ink)}
+button,input,select{font:inherit}.shell{max-width:1240px;margin:auto}.top{height:76px;padding:0 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);background:rgba(244,247,245,.94);backdrop-filter:blur(14px);position:sticky;top:env(safe-area-inset-top,0px);z-index:20}.brand{display:flex;align-items:center;gap:20px}.mark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--g),#6bc39f);color:#fff;display:grid;place-items:center;font-weight:900;font-size:19px;box-shadow:0 8px 18px rgba(21,149,107,.2)}.brand h1{font-size:18px;margin:0;letter-spacing:-.5px}.brand small{color:var(--muted);font-size:10px;letter-spacing:1.8px}.top-actions{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 13px;border-radius:12px;cursor:pointer}.btn.primary{background:var(--g);color:#fff;border-color:var(--g);font-weight:750}.btn:disabled{opacity:.5;cursor:not-allowed}.sync-dot{width:9px;height:9px;border-radius:50%;background:#9ca8a3;display:inline-block}.sync-dot.on{background:#22a979;box-shadow:0 0 0 4px #dff4eb}.sync-dot.warn{background:#e0a02b}.status{font-size:12px;color:var(--muted);display:flex;gap:7px;align-items:center}.main{padding:24px}.hero{display:block;grid-template-columns:1.25fr .75fr;gap:18px}.hero-card{background:linear-gradient(135deg,#155e49,#29a277);color:#fff;border-radius:27px;padding:27px 29px;position:relative;overflow:hidden;min-height:245px;box-shadow:var(--shadow)}.hero-card:before,.hero-card:after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.12)}.hero-card:before{width:260px;height:260px;right:-80px;top:-150px}.hero-card:after{width:170px;height:170px;left:-70px;bottom:-110px}.eyebrow{font-size:12px;letter-spacing:2px;opacity:.78}.total{font-size:48px;letter-spacing:-2.5px;font-weight:850;margin:4px 0 15px}.chip{display:inline-flex;padding:8px 12px;border-radius:99px;background:rgba(255,255,255,.15);font-size:14px;font-weight:700}.hero-bottom{display:grid;grid-template-columns:1fr 1fr;gap:20px;border-top:1px solid rgba(255,255,255,.25);margin-top:24px;padding-top:17px}.hero-bottom small{display:block;opacity:.72}.hero-bottom strong{display:block;font-size:21px;margin-top:3px}.sync-card{background:#fff;border:1px solid var(--line);border-radius:27px;padding:22px;box-shadow:var(--shadow)}.sync-card h2{margin:0 0 6px;font-size:18px}.sync-card p{font-size:13px;color:var(--muted);line-height:1.5;margin:0 0 15px}.sync-box{border:1.5px dashed #aec0b8;border-radius:17px;padding:18px;text-align:center;background:#fbfdfc}.sync-box b{color:var(--g)}.file-name{font-size:12px;margin-top:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:17px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:19px;padding:17px;box-shadow:0 5px 20px rgba(18,58,45,.04)}.stat .icon{width:35px;height:35px;border-radius:11px;background:#e8f7f1;color:var(--g);display:grid;place-items:center;font-weight:800;margin-bottom:12px}.stat:nth-child(2) .icon{background:#fff0f1;color:var(--red)}.stat:nth-child(3) .icon{background:#fff6df;color:var(--amber)}.stat:nth-child(4) .icon{background:#edf1f0;color:#53625c}.stat small{display:block;color:var(--muted)}.stat strong{font-size:21px;display:block;margin-top:4px}.nav{display:flex;gap:6px;overflow:auto;margin:2px 0 18px}.tab{border:0;background:transparent;padding:10px 13px;border-radius:11px;color:var(--muted);cursor:pointer;white-space:nowrap}.tab.active{background:#dff4eb;color:#147353;font-weight:750}.view{display:none}.view.active{display:block}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 5px 20px rgba(18,58,45,.04);margin-bottom:18px}.panel h2{font-size:18px;margin:0}.head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.muted{color:var(--muted);font-size:14px}.donut-wrap{display:flex;align-items:center;gap:25px;min-height:240px}.donut{width:190px;height:190px;border-radius:50%;position:relative;background:conic-gradient(#15956b 0 40%,#3da982 40% 60%,#7cc7a8 60% 80%,#d6e9e1 80% 100%);flex:0 0 auto}.donut:after{content:"";position:absolute;inset:43px;background:#fff;border-radius:50%}.legend2{display:grid;gap:11px;width:100%}.legend2 div{display:flex;justify-content:space-between;gap:12px;font-size:13px}.legend2 span:first-child{color:var(--muted)}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:720px}th{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);text-align:left;padding:10px;border-bottom:1px solid var(--line)}td{padding:13px 10px;border-bottom:1px solid #edf2ef;font-size:13px}tr:last-child td{border-bottom:0}.name{font-weight:780}.sub{color:var(--muted);font-size:11px;margin-top:3px}.right{text-align:right}.tag{padding:5px 8px;border-radius:99px;background:#eaf7f2;color:#20765c;font-size:10px}.tag.fixed{background:#f0f3f2;color:#68756f}.bar{height:7px;background:#edf2ef;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:linear-gradient(90deg,#15956b,#63b997);border-radius:99px}.controls{display:flex;gap:8px;flex-wrap:wrap}.search,.select{border:1px solid var(--line);background:#fafcfb;border-radius:10px;padding:9px 11px;outline:none}.search{min-width:210px}.rank{display:grid;gap:12px}.rank-row{display:grid;grid-template-columns:30px 1fr 120px;gap:10px;align-items:center}.rank-num{color:var(--muted);font-weight:800}.rank-main b{font-size:13px}.rank-main .line{margin-top:6px}.rank-val{text-align:right;font-weight:750;font-variant-numeric:tabular-nums}.history{height:250px;display:flex;align-items:flex-end;gap:8px;border-bottom:1px solid var(--line);padding:12px 4px 0}.hbar{flex:1;min-width:8px;height:100%;display:flex;align-items:flex-end;justify-content:center}.hbar i{width:100%;max-width:28px;background:linear-gradient(180deg,#3aab83,#147453);border-radius:7px 7px 2px 2px;min-height:2px}.empty{text-align:center;color:var(--muted);padding:35px}.toast{position:fixed;right:18px;bottom:18px;background:#123a2d;color:#fff;padding:13px 16px;border-radius:13px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.25s;z-index:99}.toast.show{opacity:1;transform:none}.footer{text-align:center;color:#87938e;font-size:13px;padding:4px 0 25px}.notice{background:#f7faf8;border:1px solid var(--line);border-radius:14px;padding:11px 13px;font-size:12px;color:var(--muted);line-height:1.5}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr 1fr}.grid2{grid-template-columns:1fr}.total{font-size:41px}}
+@media(max-width:560px){.main{padding:15px}.top{padding:0 14px}.brand small{display:none}.top-actions .status{display:none}.top-actions .btn{padding:9px}.cards{grid-template-columns:1fr 1fr}.hero-card,.sync-card{border-radius:21px}.donut-wrap{flex-direction:column}.donut{width:165px;height:165px}.hero-bottom{gap:10px}.total{font-size:36px}.pl-summary{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="top">
+  <div class="brand"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAaQAAACMCAYAAAAzxN3aAAAABGdBTUEAALGPC/xhBQAACklpQ0NQc1JHQiBJRUM2MTk2Ni0yLjEAAEiJnVN3WJP3Fj7f92UPVkLY8LGXbIEAIiOsCMgQWaIQkgBhhBASQMWFiApWFBURnEhVxILVCkidiOKgKLhnQYqIWotVXDjuH9yntX167+3t+9f7vOec5/zOec8PgBESJpHmomoAOVKFPDrYH49PSMTJvYACFUjgBCAQ5svCZwXFAADwA3l4fnSwP/wBr28AAgBw1S4kEsfh/4O6UCZXACCRAOAiEucLAZBSAMguVMgUAMgYALBTs2QKAJQAAGx5fEIiAKoNAOz0ST4FANipk9wXANiiHKkIAI0BAJkoRyQCQLsAYFWBUiwCwMIAoKxAIi4EwK4BgFm2MkcCgL0FAHaOWJAPQGAAgJlCLMwAIDgCAEMeE80DIEwDoDDSv+CpX3CFuEgBAMDLlc2XS9IzFLiV0Bp38vDg4iHiwmyxQmEXKRBmCeQinJebIxNI5wNMzgwAABr50cH+OD+Q5+bk4eZm52zv9MWi/mvwbyI+IfHf/ryMAgQAEE7P79pf5eXWA3DHAbB1v2upWwDaVgBo3/ldM9sJoFoK0Hr5i3k4/EAenqFQyDwdHAoLC+0lYqG9MOOLPv8z4W/gi372/EAe/tt68ABxmkCZrcCjg/1xYW52rlKO58sEQjFu9+cj/seFf/2OKdHiNLFcLBWK8ViJuFAiTcd5uVKRRCHJleIS6X8y8R+W/QmTdw0ArIZPwE62B7XLbMB+7gECiw5Y0nYAQH7zLYwaC5EAEGc0Mnn3AACTv/mPQCsBAM2XpOMAALzoGFyolBdMxggAAESggSqwQQcMwRSswA6cwR28wBcCYQZEQAwkwDwQQgbkgBwKoRiWQRlUwDrYBLWwAxqgEZrhELTBMTgN5+ASXIHrcBcGYBiewhi8hgkEQcgIE2EhOogRYo7YIs4IF5mOBCJhSDSSgKQg6YgUUSLFyHKkAqlCapFdSCPyLXIUOY1cQPqQ28ggMor8irxHMZSBslED1AJ1QLmoHxqKxqBz0XQ0D12AlqJr0Rq0Hj2AtqKn0UvodXQAfYqOY4DRMQ5mjNlhXIyHRWCJWBomxxZj5Vg1Vo81Yx1YN3YVG8CeYe8IJAKLgBPsCF6EEMJsgpCQR1hMWEOoJewjtBK6CFcJg4Qxwicik6hPtCV6EvnEeGI6sZBYRqwm7iEeIZ4lXicOE1+TSCQOyZLkTgohJZAySQtJa0jbSC2kU6Q+0hBpnEwm65Btyd7kCLKArCCXkbeQD5BPkvvJw+S3FDrFiOJMCaIkUqSUEko1ZT/lBKWfMkKZoKpRzame1AiqiDqfWkltoHZQL1OHqRM0dZolzZsWQ8ukLaPV0JppZ2n3aC/pdLoJ3YMeRZfQl9Jr6Afp5+mD9HcMDYYNg8dIYigZaxl7GacYtxkvmUymBdOXmchUMNcyG5lnmA+Yb1VYKvYqfBWRyhKVOpVWlX6V56pUVXNVP9V5qgtUq1UPq15WfaZGVbNQ46kJ1Bar1akdVbupNq7OUndSj1DPUV+jvl/9gvpjDbKGhUaghkijVGO3xhmNIRbGMmXxWELWclYD6yxrmE1iW7L57Ex2Bfsbdi97TFNDc6pmrGaRZp3mcc0BDsax4PA52ZxKziHODc57LQMtPy2x1mqtZq1+rTfaetq+2mLtcu0W7eva73VwnUCdLJ31Om0693UJuja6UbqFutt1z+o+02PreekJ9cr1Dund0Uf1bfSj9Rfq79bv0R83MDQINpAZbDE4Y/DMkGPoa5hpuNHwhOGoEctoupHEaKPRSaMnuCbuh2fjNXgXPmasbxxirDTeZdxrPGFiaTLbpMSkxeS+Kc2Ua5pmutG003TMzMgs3KzYrMnsjjnVnGueYb7ZvNv8jYWlRZzFSos2i8eW2pZ8ywWWTZb3rJhWPlZ5VvVW16xJ1lzrLOtt1ldsUBtXmwybOpvLtqitm63Edptt3xTiFI8p0in1U27aMez87ArsmuwG7Tn2YfYl9m32zx3MHBId1jt0O3xydHXMdmxwvOuk4TTDqcSpw+lXZxtnoXOd8zUXpkuQyxKXdpcXU22niqdun3rLleUa7rrStdP1o5u7m9yt2W3U3cw9xX2r+00umxvJXcM970H08PdY4nHM452nm6fC85DnL152Xlle+70eT7OcJp7WMG3I28Rb4L3Le2A6Pj1l+s7pAz7GPgKfep+Hvqa+It89viN+1n6Zfgf8nvs7+sv9j/i/4XnyFvFOBWABwQHlAb2BGoGzA2sDHwSZBKUHNQWNBbsGLww+FUIMCQ1ZH3KTb8AX8hv5YzPcZyya0RXKCJ0VWhv6MMwmTB7WEY6GzwjfEH5vpvlM6cy2CIjgR2yIuB9pGZkX+X0UKSoyqi7qUbRTdHF09yzWrORZ+2e9jvGPqYy5O9tqtnJ2Z6xqbFJsY+ybuIC4qriBeIf4RfGXEnQTJAntieTE2MQ9ieNzAudsmjOc5JpUlnRjruXcorkX5unOy553PFk1WZB8OIWYEpeyP+WDIEJQLxhP5aduTR0T8oSbhU9FvqKNolGxt7hKPJLmnVaV9jjdO31D+miGT0Z1xjMJT1IreZEZkrkj801WRNberM/ZcdktOZSclJyjUg1plrQr1zC3KLdPZisrkw3keeZtyhuTh8r35CP5c/PbFWyFTNGjtFKuUA4WTC+oK3hbGFt4uEi9SFrUM99m/ur5IwuCFny9kLBQuLCz2Lh4WfHgIr9FuxYji1MXdy4xXVK6ZHhp8NJ9y2jLspb9UOJYUlXyannc8o5Sg9KlpUMrglc0lamUycturvRauWMVYZVkVe9ql9VbVn8qF5VfrHCsqK74sEa45uJXTl/VfPV5bdra3kq3yu3rSOuk626s91m/r0q9akHV0IbwDa0b8Y3lG19tSt50oXpq9Y7NtM3KzQM1YTXtW8y2rNvyoTaj9nqdf13LVv2tq7e+2Sba1r/dd3vzDoMdFTve75TsvLUreFdrvUV99W7S7oLdjxpiG7q/5n7duEd3T8Wej3ulewf2Re/ranRvbNyvv7+yCW1SNo0eSDpw5ZuAb9qb7Zp3tXBaKg7CQeXBJ9+mfHvjUOihzsPcw83fmX+39QjrSHkr0jq/dawto22gPaG97+iMo50dXh1Hvrf/fu8x42N1xzWPV56gnSg98fnkgpPjp2Snnp1OPz3Umdx590z8mWtdUV29Z0PPnj8XdO5Mt1/3yfPe549d8Lxw9CL3Ytslt0utPa49R35w/eFIr1tv62X3y+1XPK509E3rO9Hv03/6asDVc9f41y5dn3m978bsG7duJt0cuCW69fh29u0XdwruTNxdeo94r/y+2v3qB/oP6n+0/rFlwG3g+GDAYM/DWQ/vDgmHnv6U/9OH4dJHzEfVI0YjjY+dHx8bDRq98mTOk+GnsqcTz8p+Vv9563Or59/94vtLz1j82PAL+YvPv655qfNy76uprzrHI8cfvM55PfGm/K3O233vuO+638e9H5ko/ED+UPPR+mPHp9BP9z7nfP78L/eE8/stRzjPAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAJcEhZcwAALiMAAC4jAXilP3YAAB/dSURBVHic7Z3fjyPZVce/u2OBtHSy9QxJtkYIKQFaW5MhjiNNmOpkiU0EWY9IIoGAcSswr939F3T3X9A9T0iDUHsEQgpJNJ5EirqjTaZGOwTjZJhadQiCPKx3E3gMFcUKAvXs8HCPx9flKtevU7/s85FabZerzj1Vde89955777kvPHv2DIIgCIJQNi+WrYAgCIIgAGKQBEEQhIogBkkQBEGoBGKQBEEQhEogBkkQBEGoBA3/gRfxWhl6pKLZmtgAHjCJc0bDjS0mWYKwcjRbE64puZFlrci0hPJ4D2/MfZcekiAIglAJxCAJgiAIlUAMkiAIglAJFsaQBGGVuHZn80UAnwXwBQA2gA8FnPYu1FjkVwF889Gt8/cKU1AQhOdID0lYWa7d2fxtAN8D8A0Af45gYwQ6fpPOG127s/nhYjQUBEFHDJKwkly7s/lpAEMAH0146VUAQ7peEIQCEYMkrBzUw/kagF9JKeJlAF+/dmfzI3xaCYIQhRgkYRX5ayijkoWXAJxcu7P5AoM+giDEQAySsFJcu7PZBnCNSdzHAfwekyxBECKQWXbCqvF5Znl/CuBbzDIFofY0WxMDauaqMRpu9DlkikESVo1PMcv7HWZ5glBbmq2JBWWEXqf/AOAA6HPIF4MkrBofYJb3q8zyBKE2aL2gqQEy80xPDJKwavwSs7yskyMEoVaE9IIKQQySIAjCGlN0L2gZYpAEQRDWkGZrsosSekHLEIMkCIKwnhyVrYAfWYckCIIgVAIxSIIgCEIlEIMkCIIgVAIxSIIgCEIlEIMkCIIgVAIxSIIgCEIlEIMkCIIgVAIxSIIgCEIlEIMkCIIgVAIxSIIgCEIlyD10kBa4zwLwCpYH7hsDeAuAOxpuOLkqVjDN1sSEuncLgAHgVfq/DA/qeXgo55m8COCzAP4Iap+hDwLQt/R+BuBdAA8AfA3ANwG8V7COtSdl3gCAh6C8AZU/PHblhERQpGwL6n1ej3HJ83e4anVeGnIxSFTAelCB+6yUMjwAAwB36/aifEb4OmYVTRq6mlxAVT73AQxGww03pcw4/CaAvwXw0SXnvADVyOjR378A+DMAP8xRr1rDnDdsn2wXarO0uznnDYGg99nFLEipkVCErckCVPm+C1W+xyl1slLokQWj2ZrYKa5zMYSnH2A1SKTUPniixxqgiq7ZmjgA9qpcyJqtSReqgrGR0gjHxKK/faqAbnNtH6zxGQD/gOR7AX0UwHcBfBGy7fdzqFxMKywrx6Qs+ttttiZjAIdQFZuXY5prCVX6O1B1FCcW/R1RvXc3Rfk+QrERvC0oL0lStqAaUM9hMUjUIzpBfg/BBvCk2ZocjoYbBzmlkRgyQq9DtZCMElSwAJw0W5N9KIM9YJD5WwDuAXgp5fUv0/VNAP/KoE8tqUDeMKHK5FGzNdnLodGylhRQ1+nYAGzm8l1pMhukZmtyANUrKoL9Zmvyymi4sV1QegtQF30XwE2UuJGVDxPAPWpR3cjQIn4BqrClNUZTXiI5H4caZ1oLKG/0oFrOZpm6aBhQjZabALbTuoHWHXq3+1Blv2hMqPI9gHqHXgk6FELqWXbN1sRotib3UJwxmtJrtiYnBaep8zbUPZsl6hCGDeBtciek4fcBfIxJl48BaDPJqgv3oNwlZsl6BGFDeRmskvWoHfTMnqAcY6TThSrfdsl65EYqg0SthQfQBtwLpkc9szIwSko3LgaABykrnj/mVQV/wixPyIYBZZR6JetRG+hZPUF1GhkGVPnulaxHLiQ2SJoxsriVSch+BXSoKgbSGSWu3lFe8gQejqSnFA15Ysr0xizjZBWNUiKDVCFjNKVod2GdMKD8zkaCa36NWQdueQIPBlSDxShZj8pCxqhXth4RnNDkmZUhaQ/pHqpjjIDqu8/KxkQyo73BnP77mOUJfBiobuu/VGpijKacrFJvN7ZBarYmRc9tF3jYXeVBUCET3VVrYWeFxqZ7JauRBAMr1LCIZZCoQtvNVRMhT8S1KYRxVLYCVYGMcx3LilXiJC9WIg0S+ZlXxgKvKbb0koQQTOklrUQ9t0OLdmtNnIWxu6jOlMc6MoYKj/EWVJyqcdjiRMpQNlQIoh6zHjfhC9MhlM4Y6p28Q/+j8oYFFf2hx6zHTai4kevMCfjHpB3M4tJ5+g9aOKkeU7oGVO+utKABHCw1SNRq2ClAjzH96ZioryEcQEXxTRQgkc7tA+g3W5NDKHdKl0mnLmqeWVcEFymCZ9K5YwCDZmuyB1WBdpl06jZbE3NdoziQcegyivSgIioMwk6ggNGOVs57DOn2SF5tieoh7SK/mWxjALexpGBqUcOrFKYnDA/qfvocBZtk3GCc8WM0W5Nu1eJhbT5++hqALwD4JIAPYH5m3s8B/ATAmwC+fH710neK15AFD6qhcZspb3hQeaMHPjeTDaXjOsLpqnMBbMUN70PnbTdbk4dMevSgGjwPY5zLNV42pjTTXDdHqEHKuXcUK0gqFd6DZmtyDGUcqzjgOIa6n34ewkfDjW0txH1WrqMirpnNx08/DOCvsHzm5vsAfIT+bm0+fuoAuHV+9dKPcleQBw8q4nY/j/hjo+FGv9macLl3X8caGiQy6iaTOBcJjJEOvctpMN4s3BwNNy7HOZGCtnIw5gp6vWxSQxf8vSMPwJWkyo+GGx5ds00yqoAHFYH3cgGRlPeY5NhMcjKx+fjp7wL4ZyTXxwbw/c3HTz/JrRMzHpQhujwabhznHAxzDzxlwmKQUUe4Gt0esgc+5ajfzDpPYFpmkG7mkN5Wlj2NqOKvwjhIH1TZFJEY9RQHDKIsBhmZ2Hz89DcAfB3A+1OKeD+Ab2w+fvrrfFqxMgA1uoqIykxpDBhEmesWuUHb3ZWDw6z7tdG77DPo8jqDjFIINEjarpacsGywR2MgZQ7cXRkNN8oIAX+fQ0gFVnX/DZJv/OfnZZJTNbZHw40bJUwOYMkbqECDpWC4ekdjxsZpmrEYPzaDjFII6yF1mdNxOHsT5L5zueQlTLuUdBEwAJgSg0lOYjYfP7WhJi9wcH3z8dPrTLJYKHGWmsMkx2KSUxe6THLYGshUv3gZxViZFSmJMIPEXdDz6NFwjavUApomyoHNJCcNX2SW93lmebWEsbduMMmpPOQpMBhEeTmMIbtZBdR1HClslp3NmIbDWJk+ZzTccJqtyRjVnw6eCZr6bqLGrR6NTzPLe41ZXq3Q8oZZqiL1pMskZ8AkR+chstfBFmq4EH7BIGmZnAsOn2gYA6xAjD2tNWNDjY9YWM2K5hVmeR9illc5QvKGgXwaKK/mILOqcHmB4qz3KQOjbAXSENRDMpnTGDDL07mPGhgkX0vWhCr4BmaVy7rwy8zyXmKWVzg0gchCNfJG0emVicUkx2WSw00tGxdBBslmlO/mPBvNzVF2aqhVa0O1wiysV0EXliB5o3yoEWAwictjCw+O3pvBIKNwggxS1im5Og6jrAVGww2v2ZrkmURsKFPeBP8MRaHmUN6YrsI3ytRFAMDr7qxi9JjaEmSQLEb5bzHKqhzU0tpFPWLtCQVDYWn2IXmjaphlKyAEE2f7iSyMc5ZfGlTZHEFavIIP6hEdQSq+qmKWrYAQTN6TGjxGWZWAekX3UOPV0EI+aJu8dcvVRBDqSa4GqcSoBrlAi+keQHpFgg+aSXkPq7FeTBBKIW+X3cogxkgIg4zRE0jeqAucE7cERpZF+xYIcsWIMRIW0Fy4RrmaCAmwylZACEZ6SPEoo8LxoNZZeVCzFcfg3dlS4OEExVdwHubzhgc1iUKIh1e2AkIwYpAioNl0dk7iXajCMQ0/4kAFa3RDdBGDVCFokWs3J/EuFvNGaJDdZmsiBik+b0EmnlSSXA1SszWxVmBiA/fCtz6A+7Svk1BvuBsIfahwWE4J+20JQukEGSQPfO4pLjmB5B1inXpHJpO4AdQmhWMmeUKJUN4zmcQNIHmjrjhlKxCCW7YCaQgySC74XFQW8n1hZo6yAb6tgLdz2DNFKJebTHL6o+HGNpMsIR4eo6zDPLbXWVfynmWXd8TZ3HYMpdlTXQZRx2KMVpIug4yBGKNScBllGYyy1p4ggzRmlG8zyipaPodsD0y75dZ1B8hVhN6FwSCKZddjajwJ8fEYZVmMstaeIIP0DqN8kxaUssPsww/CYpDBOThtMskRsmMxyHAYx4wsJjlrAfNEKy63fp0xuAQFGSSXSzjB5WsvSu4UDncjZ7Tz3NyTQmI4dr7l3GlUKsXkOExyLIrUsc5YXIKKMEg9bpcC9bp6nDIDMBhkuAwyOMezBB6sshXw0S1bgRriMsrqMcqqJVx1/IJBIjeCxyGcMMC/lqcuC0RNJjldyOCpEADz0oR1grOHuiPjeDzj+WGz7BwO4Rq7XIPytCLd4pAVgc0gI7NrhzK6rMJfPTK7hClvyI6l6XAYZRmoTyNZx2OUxeI2DjNI9zmE+7iXdYIDtQZ3OZQpiC6DjBNI72gVsRla1bIJYEpostGAUWS3jNBezdakS/ViGlxGVbocvcSiekiAqlQf0G6aiaGeUZEv3GWQYTZbk920F1MG7zLoIVQPAxkaV1QJ9XhUWVvuMsvrFWWUmq2J3WxNHkAFfjaLSDMCAwz1c6BBonGkQVbhARhQPaWTuDNT6ME/QfE9I49Jzn6aniFl7B6TDkI12U/Tum22Jgeop4uoUlA8yTGz2F6zNXmSx7rBZmtiNFuTHtWHD5B9WMHLrNQ8XarbjWUnNVsTs9maHATVi8uCq95Hfq3zHtSLG0BNjXYCzrGh/JJWTjpE4THJMaB6hoej4cZx1MmUkYsaJxPS4YJvUfZJszUxR8ONg6gTJW/kwm3wj9FaUGXeAXA7SyBlbYbtdfBPbsoj6nkPyjD1sTj0Y2F2H0BAvR9qkEbDjX6zNdlHvt3BLv1VcWCW82UZAI6arckOVM/T/6IMzF6UyZSmkB+ci8cB1VO6CZU3HmKxMWSj3MbZKtMHsIN8yp0NNVYIqMr3IVSPbLzkGpP+XoV633noNcXNSa4B5dHaTXph1PYTh1hf14Cbg0wTKV+UUCmcHGSakLxROKPhhtdsTYqo52zkH0otKW7ZCvhZGlyVgoKOC9GkejhlKyBUEwo945WshsAE1XNOyWoUDs0VcEtWY4440b7XMhpxDtNChdViULYCAivbWM9GRh5LfFITaZBor49+7pqkw8tZ/u2c5SdhXEAaP89Z3v8yy/9FwLH/Y07jf0KOVylvOGUrUHeot3CjbD1KoF+2Ajpx90PaQ8W6dgTL1g5hkDF28kwjJh6YtiqI4L+Y5f2n7zv3ZIB3A479mDmNnwQdJLedw5xWGjysqReDGyrva/UsyRD3S1bjObEMErmvqtal3UYxRjJXoxeTop79iFne93zfv80s/7sBxx4wp7FMXhUqL9n6nBEaT6rCey2SKtRxABLsGEstwi1Uwyj1i9qFlVpNx0WkFcJxlnUMCfn7nOV9lVn+3wUc+zJzGl8J+4EMQRE91zAKKwfrxLoZJcrHlTBKibYwr4hR6he97fNouLGHctwzfUq7KM7A10sakbznnF+99B0AbzLJf/P86qWF3sujW+dvMKbxT4jo1dFi5z5TekkovBysE2SUyq7rCoMWZg9KViOZQQKeG6UrKGdM6bjEQngDxd5zGRXOM6iWYdBkgST8guQ8C/jtLwH8LKP8nwH40pLf/4IhjZ8D+NKjW+dB9zAHvad+xvSSIMaoAMg7chkVqKgLoqhhkFASGyTgeRdvC8W5sjwANwruLcxB42hbKKbi2SuxwvkhgM8BmKS8fgLgD0nOAudXL/07/f7TlPJ/CuAPzq9e+lHYCY9unf8HVNSLLPfwuUe3zv8t7gX0vo5TppeEQzFGxTEabnij4cYNqLI/LlkdP2MoV9sxh7CC67hAUhkk4PmL2oO6AYdNo0X6AC4XOI4SCt3zNlRvycshCQfAlTgx73Lm2wA+AeD7Ca/7Pl33nWUnnV+99CaAFpLnGwdA6/zqpUdRJz66de6QLv+YMI03AXyCrk8ElYcbyKficqHyxkEOsoUIRsMNZzTcuAzVi3BKVmcAYHs03Lg8Gm4ckCFhoYA6bilRoYMimU6NpsCPO+CL/9aHag2Ol5zjgS9zuHFPHA03BhQ4cRfqno2MaTtQ9+osOccDz72OY573AwBNAB0AnwfwKQAfwHyeuYCaFv0dqAkLpwh20y1APZytzcdPPwPgiyT/gwHy3yX5Xzm/eulbMXUHADy6df4DANeu3dnsAPjCknv48TSNR7fOzxYEJcCXN24ieywyFypAZz/iPCdjOtO08k4jTjpFpxUbeg99ilR9E8XEn/Sgnsd9AANOAxSGlo974I/150Gt43P9P7zw7Nl8/fEiXsuUki86rY34NzLGLABhIQ+dC9rjaRr80op5mYNZBhvnoJZQAShvTMuCFfMyB7Ny4OaglsAIbaVjQ73n6ee0uFAV9jQQq1uFPEAGuItZXk6CB3VfD6HuZzD94T28MXciu0EKImpvkIieQe2IuN+xGKD1hQq2EfKzV4XKR+AhyZ5IdasDyQibUedF3VcpBkkQBEEQ/PgNUupJDYIgCILAiRgkQRAEoRKIQRIEQRAqgRgkQRAEoRKIQRIEQRAqgRgkQRAEoRKIQRIEQRAqgRgkQRAEoRKIQRIEQRAqgRgkQRAEoRKIQRIEQRAqgRgkQRAEoRKIQRIEQRAqQegGfe1O4yDst7PTi9DffNe5Z6cXgziKtDsNG7N9NvpnpxfjgHNMqA2jAMA7O704jiNbu76HWcj0sDR0PaIYn51e9GOmbULtJ/Iq5sO2uwDeATAI0oeuPYipTxDO2emFE6JPTzsU+14CZO1itqVCpBzOZxwga3B2euHGEaw/17A8nVDXBZaVlST48m4QDlR58zKm04Xat+lVaO8UwFtQeclNIdPG8mfoQuk+jinvIKkOGnHqligSl5V2p2FhVv4NOuxBPdfYedYn08bsuQaW8wTX+0kkj+7PxmL99hAJ7MCyHWP3l/x2EPe6dqdxJebDtrVrHYTvbPpcfrvTCK3E/bQ7DQPAiXaoH0OPKJwlcqbpmpSuvSQ9QG3wtxVyTlx9wnACjpl+ufQ8vSSCKSMe+dLqR1xm+9NeQpQ8v6zXAVyJKVu/7iCm/KSEyU3KTSyv1PcBoN1p9AHspXiPPZJhRpznkHw3gXgbMZ4hyd6OUaazvA8HwXWLmUCug+g8DuC5gT9C+HPtAthvdxpjqHt3YuoALD7XJNcGXe8nUh4ZtX1E1G90f3tRhqkIl91J9CnxoIzqaId2Elze0z47cQ1ZFqiyfoJsO0gWyW6Ka5K8gyKwMrag604PwBNqCEXS7jSMdqdxD6qcxrnGBvCADBg3NpTuVg6yC6fdaZwAuId4z9VEfs81F8gz8gDx6jcTwD16JqGE9pDOTi9eoESf+Y8lxGp3GrtJ3WtLuIvZA+gC2It53U2fjDj0I871Iq4/wbzb4xCqe+4Bz3tPtk+3IMJ6TkeYbYu9h4A96hHe0wxiBwla9AndHGH0ke0ZB7HT7jQCXTMp6CO4pWhh1jN0ET8fcuB/1yZUz7CrfT9BeL7RuYf5CsWBeh96PrVI9g5UfjYAnLQ7DS+uK2aJ7gbp3tO+H0XoHqc8hJ3jhhzX6SNjnqSKt6cdGkOV/+eNYc2Nv4OZ0TppdxpI6z5PArmTD6gBN+0pHcZxM5Ph1D0jHoDb0NyPWv2m97x7lG8Cy8sylx0n+0ncaxEMMOt1me1Ow4pyH9CDseirRzLi8E5Sv6yWpu1L84rfjULPow+gv6xFG6ZDu9PQ5blpddUw2p1GL0Fh6GVMD8jwjJdgIH6FvBR6R2P/8XZnruh4OdzDMoLedZ8qiWnZsKPKBlVEtnYosDIiGW670ziGahFb9NNJu9NwEroHg3QftDuNhz7dzbD6Ik55yPg+MuVJctP1tEN9BLhR6f6Oyc16pF1z0u403DTjSkVADRS9p+MAuBFRv+kGerfdaTwMaszk6bJzMGtZGmBy3dFN97VDUb0LYN6tlHicJCWW9rkflWYRLsQleNrnWC44GpObnuuFn1kofcx0sevk/uCAGhID7VA37Fzf+wNitIwpD29hZqANpHPzBsnuY7HXV1f0nkP/7PRie1n5Pzu98M5OL7Yx3xM/Cjm9Cui6uWenF1sx6rdtzNfbgfeX9xjSNuYriC6T3Pva516M8/V047rrsmKEfK4iLmaVjEW9uyi6mN2Xy6xPWt6BcotMOaKKd514K+Z5PWjvL+5sQKp4trVDnGOILqOsUvDNhvSQzJWrP1c77jhgkWiz6abcSHD5Hmb2wAyyB7kaJGr16xXECUcFQV09j74aywwdPUCTvo4LdK3o6XRrMFCrv6c4lYw+O+c2sy6pobFKh74aYJxUs2LonoVE74/K0Ji+GjEbMHEwmeSUyeva59tJvDFUXw60Q10WjXjpap8TjdMGeLeu+8/JfZYdVRAufTXAV0H0tc+vh50En7uOKe1I/IUWFZ9BQy4Tj752l7XO/Ou5UB2X3RS9Vdpl7JnXgVe0z96S8yzt8yBFOvo1dorr5/C1vIsek+PE0j4PUlz/UPv8aiZN8kE3IvdDzwpHvz/L/2NRkxq2oaY/A6qCsBky3F3M/NddzHd3dbra56Qt+VciWn9RCxFvQA0CG5jNTNqB8tcPEupSBLcx6/nsINzdoLeuD5GtZZv1GS9wdnrhtjuNQ8zu5SjF4Hvt0GbDTXFCzrO1r2kX076jfX45xfV+fe5phyrT406BOf2QclKCfo0Zck6ZWNpnJ8X1bogsAAWFDqIXw+q6I5lj+moE9T6oZTxNJ/ZKcI0elEEJ+7Ni6KgPAoOuudfuNN5mdHVwcax97gW9o4DV4eOMafaQ4RmHQWMiLn01kX1xcaWh/D9t/ADxoyp4KZPUZVsJrjtqdxoPtL+3Ma93nyu6RQb2253GsyV/dtBFvvLiFqFoCRjTD2kaMr76wvD/Xlgsu5wqCL0lFeS2S+0n5+Ls9MI9O724DGWQPe0nE8qN96AqA+8+H6+B4Akj/t5RldF7zbsVbACkxV+p/zfm17x5CPcYlI0F1aCZ/pl0fAwVqaCqesfB0j57JelQa4py2U3Zg2oNAaqCuJtxrv0As+mD3XanYWiL+QzMuy8GKeQ7mPd5+hnHFXR2enFA6zh2MVtgCKhC+Xa709iqyLqDQ8wM0Q60XpNvISzXBBEHTM/YD7nujjFz7R4hflihKmMt+c1FvPA7WTG0zxxpeShwjDeCMZbfkxdy3NU+WyyarDae/0ChBuns9MLxVRAnyFBBnJ1ejNudxgAzw9PFrIXf1U6NXAcUwkNO9wHpoBumaS/RgHLjLSyeLRp6pg6o9druNLraeNfcuhWmJFmfcQCHUHnBBIUVqoBLiJsxVGV4P+aiZk/7bKZM09I+vxN2UgBb04aML86bBTWOlHkxMwN30+SRs9MLT1swbaRMW7/OSykjT8agPBMnKIEf32zjhWvL2H7iEPNrXg4yytNneujupJ2Qc0qHFsIdQBU+jw6b4Il8wMHCFHDqcfbomFdEaBMOAtbN7FdxfUdCts5OL17Q/i6fnV7ciPtOfJWImfJ56DPA3LCTIvQYYL4M2BQfrc6Mpx9Szu7UZ7HFXVNWJGPts53iev2asf/Hwg1S0MK6jBXEAPMZelrALDo2ruiMtunU8KhxsMIhvVz6alOrpodZ661Ws6DofvraIVmbNO8e6yW5MMAd7qRVglyLq9RgcLTPacpzV/s8yKJIToR1AOKiP5MFV30pG/RRBTGgrwYyVBBk4AbaoS6q/1J1nLIVCEE3OjuY73EeF6sKC/oq8VVoiWdFr1iSNgr1CUmZQ3FRg9GhrwaqHTYnCj0STC/JRBrKkyZ9HVdkTNnPQPtsJSlH1GO06auHgLq5zB1j58IKIZ21neK32nrlWUprPkEBj3teoZD7Z0xfu5jf2NArXKGMBLnuSlKlEvjerwE1hmlEXUfTy3e1Q1zlS383tV3MTI1tRzt0L06UlvbivmKVnMGqBUydsp/g/vSOR2AUi9IMUkAFYWaQNYA2LqXJSrP2iIserTXqhZ1AL0mvGCs11oVZa8/QjlWyoMSB8smAvhqlKVId9PJnQS1DsINObKt9k44wX6kcc0VUmEa+1g7VOQ6h3tg2oJ5rN+hEeq4HmAUOAFSvs5+fepnZw2IUmt2wkwPWyIXGTky0hfn0GNcspbPTi4FvllwWBliMPJy19Xaz3WksxFvysWz3TBNqEfAJFqc3X8fiAF8/hY55coz5Kep5bGyY9RknZRvquRtM8moLzXrdxszIWFCViwuVX39Gx1/FYhntn4XsaZOB6ZIDA6rs7IJvx93CoJmq25hFnzCgekpjqHpKf6425vOii3RryKLKket/X9oid/2661TPO2GNDZpN6I9Cc0RRaBzMZl2+gvm1ZoCq50IDsibdwnx67GDJdUnZA08FoYcSmjLIKNNEdM/NiCnLRvislDEC9hMpG8p4A8wGvfNwf5rge8aR0D0dot7jFGycnV7022ofIX1hrYXl62iOczBG03ezh5mBnO6j5nKnlTfU2L6C+R1jTSzfrmMAtYbMS5GkieReJhuL9bwNLRJL2IW0xm8L6l1Zmg69Jek5iKjnyhxDAhAYETytHBfz00/LHus4Bu0QueQcF8ogX6lwoZu+m8rOVkyKLyL42kPvdRpNxA05bQzVg7+chzHSdOlj/t3UdqyPyvQVqB6PG3KaB/Vct2jqvleAaixQFJrp/Q2WnDqAur/IfZNeePbs2dyBF/FaNi2FQGiSgzn9XuNoxsIawBSAVfDhe67jEse4c4HGxQ36Gnl/7+GNue8LBkkQBEEQyqB0l50gCIIgAGKQBEEQhIogBkkQBEGoBGKQBEEQhEogBkkQBEGoBP8P1rRcph6ljlsAAAAASUVORK5CYII=" alt="DAWallet" style="width: 132px; height: 44px;">
+<medium>Personal Trading Portfolio</medium></div>    <div class="status"><i id="dot" class="sync-dot"></i><span id="syncText"></span></div>
+
+  <div class="top-actions">
+    <button class="btn" id="connectBtn" title="Connetti / importa Excel" style="
+      padding: 8px 10px;
+      display:flex;align-items:center;justify-content:center;
+      "><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></button>
+    <button class="btn primary" id="refreshBtn" disabled><medium>&nbsp;↻&nbsp;</medium></button>
+  </div>
+  
+</header>
+
+<main class="main">
+  <section class="hero">
+    <div class="hero-card">
+      <div class="eyebrow"><h3><strong>PATRIMONIO TOTALE</h3></strong></div>
+      <div class="total-row">
+        <div class="total" id="total">—</div>
+        <button class="eye-icon-btn" id="toggleAmounts" title="Mostra/nascondi importi" aria-label="Mostra/nascondi importi"></button>
+      </div>
+      <div class="chip" id="updated">dati Excel</div>
+      <div class="hero-bottom">
+        <div><medium>Posizioni variabili</medium><strong id="variable">—</strong></div>
+        <div><medium>Posizioni fisse</medium><strong id="fixed">—</strong></div>
+        <div><medium>Totale investito</medium><strong id="investedTotal">—</strong></div>
+        <div><medium>Profitto/Perdita</medium><strong id="plTotal">—</strong></div>
+      </div>
+    </div>
+
+
+
+    
+    <div class="sync-card">
+      <h2>Sincronizza Excel</h2>
+      <p>Incolla il link diretto al file (es. link "raw" di GitHub, o un link di condivisione con accesso diretto). Se il link è collegato, l'app lo ricontrolla automaticamente ogni 30 secondi mentre la pagina resta aperta, e quando torni su questa scheda.</p>
+      <div class="controls" style="align-items:center">
+        <input class="search" id="syncUrl" placeholder="https://.../file.xlsx" style="flex:1;min-width:220px">
+        <button class="btn primary" id="saveUrlBtn">Collega link</button>
+      </div>
+      <div class="sync-box" id="dropbox" style="margin-top:14px">
+        <button class="btn" id="chooseBtn">Oppure importa un file dal telefono</button>
+        <div class="file-name" id="fileName"></div>
+      </div>
+    </div>
+
+
+  </section>
+
+  <section class="cards">
+    <div class="stat"><div class="icon">↗</div><small>Quota variabile</small><strong id="varPct">—</strong></div>
+    <div class="stat"><div class="icon">€</div><small>Quota fissa</small><strong id="fixPct">—</strong></div>
+    <div class="stat"><div class="icon">▱</div><small>Posizioni</small><strong id="count">—</strong></div>
+    <div class="stat"><div class="icon">★</div><small>Maggiore esposizione</small><strong id="largest">—</strong></div>
+    <div class="stat"><div class="icon">%</div><small>Rendimento medio</small><strong id="plPctAvg">—</strong></div>
+  </section>
+
+  <nav class="nav">
+    <button class="tab active" data-view="overview">Panoramica</button>
+    <button class="tab" data-view="positions">Posizioni</button>
+    <button class="tab" data-view="performance">Performance</button>
+    <button class="tab" data-view="allocation">Allocazione</button>
+    <button class="tab" data-view="history">Storico</button>
+  </nav>
+
+  <section id="overview" class="view active">
+    <div class="grid2">
+      <div class="panel">
+        <div class="head"><h2>Top esposizioni</h2><span class="muted">Valori € · %</span></div>
+        <div id="rank" class="rank"></div>
+      </div>
+      <div class="panel">
+        <div class="head"><h2>Struttura del patrimonio</h2><span class="muted">Variabile / Fisso</span></div>
+        <div id="structure"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="head"><h2>Per categoria</h2><span class="muted">Raggruppamento automatico</span></div>
+      <div id="category"></div>
+    </div>
+  </section>
+
+  <section id="positions" class="view">
+    <div class="panel">
+      <div class="head">
+        <h2>Portafoglio completo</h2>
+        <div class="controls"><input class="search" id="search" placeholder="Cerca posizione…"><select class="select" id="filter"><option>Tutte</option><option>Variabili</option><option>Fisse</option></select></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Posizione</th><th>Investimento</th><th>Categoria</th><th class="right">Investito</th><th class="right">Valore</th><th class="right">P/L</th><th>Peso</th></tr></thead><tbody id="tbody"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="performance" class="view">
+    <div class="panel">
+      <div class="head"><h2>Profitto / Perdita</h2><span class="muted">rispetto al capitale investito</span></div>
+      <div class="pl-summary" id="plSummary"></div>
+    </div>
+    <div class="panel">
+      <div class="head"><h2>Rendimento per posizione</h2><span class="muted">% su capitale investito</span></div>
+      <div id="plChart"></div>
+    </div>
+  </section>
+
+  <section id="allocation" class="view">
+    <div class="grid2">
+      <div class="panel"><div class="head"><h2>Allocazione per categoria</h2></div><div id="donutWrap" class="donut-wrap"></div></div>
+      <div class="panel"><div class="head"><h2>Concentrazione</h2><span class="muted">prime 3 / 5 posizioni</span></div><div id="concentration"></div></div>
+    </div>
+  </section>
+
+  <section id="history" class="view">
+    <div class="panel">
+      <div class="head"><h2>Storico patrimonio</h2><span class="muted">snapshot locali</span></div>
+      <div id="historyChart"></div>
+      <div class="notice" style="margin-top:15px">Ogni aggiornamento dell'Excel viene registrato come <b>snapshot locale</b>. In questo modo potremo costruire nel tempo un vero grafico del patrimonio senza modificare il tuo Excel.</div>
+    </div>
+  </section>
+
+  <div class="footer">dawallet Portfolio OS | di Daniele Angelini</div>
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const DEMO=[{"name":"BPER BANCA","type":"Trading Conto Titoli","value":74189.0,"invested":22325.6732,"plAbs":51863.3268,"plPct":2.323035,"group":"Variabili"},{"name":"ARCA FONDI","type":"Investimenti Fondi e ETF","value":137889.0,"invested":109125.254077,"plAbs":28763.745923,"plPct":0.263585,"group":"Variabili"},{"name":"ETORO","type":"Trading Conto Titoli","value":27055.0,"invested":15000,"plAbs":12055,"plPct":0.803667,"group":"Variabili"},{"name":"TINABA1","type":"Trading RoboAdvisor","value":11813.0,"invested":10000,"plAbs":1813,"plPct":0.1813,"group":"Variabili"},{"name":"TINABA2","type":"Trading Crypto","value":8571.0,"invested":8855.22,"plAbs":-284.22,"plPct":-0.032096,"group":"Variabili"},{"name":"TINABA3","type":"Trading Conto Titoli","value":5139.0,"invested":5000,"plAbs":139,"plPct":0.0278,"group":"Variabili"},{"name":"FINECO TRADING","type":"Trading Conto Titoli","value":16834.0,"invested":15000,"plAbs":1834,"plPct":0.122267,"group":"Variabili"},{"name":"TRADE REPUBLIC","type":"Trading Titoli e Crypto","value":10297.0,"invested":10000,"plAbs":297,"plPct":0.0297,"group":"Variabili"},{"name":"ING TRADING","type":"Trading Conto Titoli","value":14755.0,"invested":15000,"plAbs":-245,"plPct":-0.016333,"group":"Variabili"},{"name":"FONDAPI","type":"Fondo Pensione con TFR","value":90682.0,"invested":87943,"plAbs":2739,"plPct":0.031145,"group":"Variabili"},{"name":"POSTE ITALIANE1","type":"Libretto1 Deposito minori 18 anni","value":25750.67,"invested":22900,"plAbs":2850.67,"plPct":0.124483,"group":"Fisse"},{"name":"POSTE ITALIANE2","type":"Libretto2 Deposito minori 18 anni","value":2811.21,"invested":2500,"plAbs":311.21,"plPct":0.124484,"group":"Fisse"},{"name":"CHERRY BANK","type":"Conto Deposito - dic/29","value":19864.8,"invested":18000,"plAbs":1864.8,"plPct":0.1036,"group":"Fisse"}];
+let data=JSON.parse(localStorage.getItem("pos_data")||"null")||DEMO;
+let sourceDate="19/09/2026";
+let fileHandle=null;
+let lastHash="";
+let snapshots=JSON.parse(localStorage.getItem("pos_snapshots")||"[]");
+let hideAmounts=JSON.parse(localStorage.getItem("pos_hide")||"false");
+let sourceUrl=localStorage.getItem("pos_url")||"";
+let urlHash="";
+
+const euro=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n);
+const euro2=n=>new Intl.NumberFormat("it-IT",{style:"currency",currency:"EUR",maximumFractionDigits:2}).format(n);
+const pct=n=>new Intl.NumberFormat("it-IT",{style:"percent",maximumFractionDigits:1}).format(n);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const mask2=n=>hideAmounts?"••••••":euro2(n);
+const mask0=n=>hideAmounts?"••••••":euro(n);
+const plClass=p=>p>=0?"pl-pos":"pl-neg";
+const plSign=p=>(p>=0?"+":"")+pct(p);
+function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),2200)}
+function save(){localStorage.setItem("pos_data",JSON.stringify(data));localStorage.setItem("pos_snapshots",JSON.stringify(snapshots))}
+const EYE_OPEN='<svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF='<svg viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 5.2A11 11 0 0 1 12 5c7 0 11 7 11 7a17.9 17.9 0 0 1-4.2 4.9M6.5 6.7C3.7 8.5 2 11 2 11s4 7 11 7c1.6 0 3-0.3 4.2-0.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+function setToggleBtn(){document.getElementById("toggleAmounts").innerHTML=hideAmounts?EYE_OFF:EYE_OPEN}
+function setConnected(on,text){document.getElementById("dot").className="sync-dot "+(on?"on":"");document.getElementById("syncText").textContent=text;document.getElementById("refreshBtn").disabled=!on}
+
+function parseWorkbook(buf){
+  const wb=XLSX.read(buf,{type:"array",cellDates:true});
+  let best=null, bestScore=-1;
+  for(const sn of wb.SheetNames){
+    const ws=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:null,raw:true});
+    let header=-1;
+    for(let i=0;i<ws.length;i++){
+      const a=ws[i].map(v=>String(v??"").trim().toLowerCase());
+      const hasName=a.some(v=>v==="posizione"||v==="istituto"||v.includes("posizione")||v.includes("istituto"));
+      const hasValue=a.some(v=>v.includes("valore"));
+      if(hasName&&hasValue){header=i;break}
+    }
+    if(header<0) continue;
+    const h=ws[header].map(v=>String(v??"").trim().toLowerCase());
+    const ib=h.findIndex(v=>v==="posizione"||v==="istituto"||v.includes("posizione")||v.includes("istituto"));
+    const ii=h.findIndex(v=>v==="investimento"||v.includes("strumento"));
+    const iInvested=h.findIndex(v=>v.includes("investito"));
+    const iv=h.findIndex((v,idx)=>v.includes("valore")&&idx!==iInvested);
+    const iPl=h.findIndex(v=>v.includes("profitto")||v.includes("perdita"));
+    const iPct=h.findIndex(v=>v==="%"||v.includes("percent")||v.includes("rendiment"));
+    if(ib<0||iv<0) continue;
+    let group="Variabili", out=[], dt=null, sawMarker=false;
+    for(let i=0;i<ws.length;i++){
+      for(const cell of ws[i]){
+        if(cell instanceof Date) dt=cell;
+      }
+    }
+    for(let i=header+1;i<ws.length;i++){
+      const r=ws[i], b=r[ib], c=ii>=0?r[ii]:"", d=r[iv];
+      const label=String(d??"").toLowerCase();
+      if(label.includes("posizioni fisse")){group="Fisse";sawMarker=true;continue}
+      if(label.includes("posizioni variabili")){group="Variabili";sawMarker=true;continue}
+      if(b&&typeof d==="number"){
+        const invested=iInvested>=0&&typeof r[iInvested]==="number"?Number(r[iInvested]):null;
+        let plAbs=iPl>=0&&typeof r[iPl]==="number"?Number(r[iPl]):null;
+        let plPct=iPct>=0&&typeof r[iPct]==="number"?Number(r[iPct]):null;
+        if(plAbs===null&&invested!==null) plAbs=Number(d)-invested;
+        if(plPct===null&&invested) plPct=plAbs/invested;
+        out.push({name:String(b).trim(),type:String(c||"").trim(),value:Number(d),invested,plAbs,plPct,group});
+      }
+    }
+    // Nessun marker "posizioni fisse/variabili" nel foglio: classifica per parola chiave nello strumento.
+    if(!sawMarker) out.forEach(x=>{const t=x.type.toLowerCase();x.group=(t.includes("deposito")||t.includes("libretto"))?"Fisse":"Variabili"});
+    const score=(iInvested>=0?100:0)+out.length;
+    if(out.length&&score>bestScore){bestScore=score;best={data:out,date:dt}}
+  }
+  if(!best) throw new Error("Non ho trovato una tabella con Posizione/Istituto e Valore (€).");
+  return best;
+}
+async function readHandle(){
+  if(!fileHandle)return false;
+  try{
+    const perm=await fileHandle.queryPermission({mode:"read"});
+    if(perm!=="granted"){setConnected(false,"Permesso da rinnovare");return false}
+    const file=await fileHandle.getFile();
+    const buf=await file.arrayBuffer();
+    const parsed=parseWorkbook(buf);
+    const signature=file.name+"|"+file.lastModified+"|"+file.size;
+    if(signature===lastHash)return false;
+    lastHash=signature;
+    data=parsed.data;
+    sourceDate=parsed.date instanceof Date?parsed.date.toLocaleDateString("it-IT"):new Date(file.lastModified).toLocaleDateString("it-IT");
+    snapshots.push({ts:Date.now(),date:sourceDate,total:data.reduce((s,x)=>s+x.value,0)});
+    snapshots=snapshots.slice(-120);
+    save();render();
+    document.getElementById("fileName").textContent=file.name+" · "+data.length+" posizioni";
+    setConnected(true,"Connesso");
+    return true;
+  }catch(e){setConnected(false,"Errore lettura")}
+  return false;
+}
+async function connect(){
+  if(!window.showOpenFilePicker){
+    document.getElementById("fallback").click(); return;
+  }
+  try{
+    const [h]=await window.showOpenFilePicker({types:[{description:"Excel",accept:{"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":[".xlsx"],"application/vnd.ms-excel":[".xls"]}}],multiple:false});
+    fileHandle=h; lastHash="";
+    await readHandle();
+    toast("Excel collegato: da ora puoi aggiornarlo e sincronizzare.");
+  }catch(e){}
+}
+async function manualRefresh(){
+  if(fileHandle){
+    await readHandle(); toast("Controllo Excel completato");
+  }else if(sourceUrl){
+    await fetchFromUrl(sourceUrl,true);
+  }else toast("Prima collega un file o un link Excel");
+}
+async function fetchFromUrl(url,manual){
+  setConnected(false,"Aggiornamento…");
+  try{
+    const res=await fetch(url,{cache:"no-store"});
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const buf=await res.arrayBuffer();
+    const signature=url+"|"+buf.byteLength;
+    if(signature===urlHash){
+      setConnected(true,"Sincronizzato · "+new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}));
+      if(manual) toast("Nessuna modifica rilevata");
+      return false;
+    }
+    urlHash=signature;
+    const parsed=parseWorkbook(buf);
+    data=parsed.data;
+    sourceDate=parsed.date instanceof Date?parsed.date.toLocaleDateString("it-IT"):new Date().toLocaleDateString("it-IT");
+    snapshots.push({ts:Date.now(),date:sourceDate,total:data.reduce((s,x)=>s+x.value,0)});
+    snapshots=snapshots.slice(-120);
+    save();render();
+    document.getElementById("fileName").textContent="Link collegato · aggiornato "+new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"});
+    setConnected(true,"Sincronizzato · "+new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}));
+    if(manual) toast("Excel aggiornato dal link");
+    return true;
+  }catch(e){
+    setConnected(false,"Errore link");
+    document.getElementById("fileName").textContent="Errore nel leggere il link ("+e.message+"). Verifica che sia un link diretto al file e che permetta l'accesso da altri siti (CORS).";
+    if(manual) toast("Errore: "+e.message);
+    return false;
+  }
+}
+function render(){
+  const total=data.reduce((s,x)=>s+x.value,0), vari=data.filter(x=>x.group==="Variabili").reduce((s,x)=>s+x.value,0), fix=total-vari;
+  const withInvested=data.filter(x=>typeof x.invested==="number");
+  const investedTotal=withInvested.reduce((s,x)=>s+x.invested,0);
+  const plTotalAbs=withInvested.reduce((s,x)=>s+(x.plAbs||0),0);
+  const plTotalPct=investedTotal?plTotalAbs/investedTotal:null;
+  const sorted=[...data].sort((a,b)=>b.value-a.value);
+  setToggleBtn();
+  document.getElementById("total").textContent=mask0(total);
+  document.getElementById("variable").textContent=mask0(vari);
+  document.getElementById("fixed").textContent=mask0(fix);
+  document.getElementById("investedTotal").textContent=withInvested.length?mask0(investedTotal):"—";
+  const plEl=document.getElementById("plTotal");
+  if(withInvested.length){plEl.innerHTML=`<span class="${plClass(plTotalPct)}">${plSign(plTotalPct)}</span>`+(hideAmounts?"":` <span class="muted">(${euro2(plTotalAbs)})</span>`)}else plEl.textContent="—";
+  document.getElementById("varPct").textContent=pct(vari/total);
+  document.getElementById("fixPct").textContent=pct(fix/total);
+  document.getElementById("count").textContent=data.length;
+  document.getElementById("largest").textContent=sorted[0]?.name||"—";
+  const plPctEl=document.getElementById("plPctAvg");
+  if(withInvested.length){plPctEl.innerHTML=`<span class="${plClass(plTotalPct)}">${plSign(plTotalPct)}</span>`}else plPctEl.textContent="—";
+  document.getElementById("updated").textContent="aggiornato · "+sourceDate+" · "+data.length+" posizioni";
+  renderRank(total,sorted); renderStructure(total,vari,fix); renderCategory(total); renderTable(total); renderAllocation(total); renderHistory(); renderPerformance(investedTotal,plTotalAbs,plTotalPct,withInvested);
+}
+function renderPerformance(investedTotal,plTotalAbs,plTotalPct,withInvested){
+  const sEl=document.getElementById("plSummary"), cEl=document.getElementById("plChart");
+  if(!withInvested.length){
+    sEl.innerHTML=`<div class="empty" style="grid-column:1/-1">Nessun dato "Valore investito" trovato nell'Excel: collega un file con questa colonna per vedere il profitto/perdita.</div>`;
+    cEl.innerHTML="";
+    return;
+  }
+  const currentTotal=withInvested.reduce((s,x)=>s+x.value,0);
+  sEl.innerHTML=`
+    <div><small>Totale investito</small><strong>${mask0(investedTotal)}</strong></div>
+    <div><small>Valore attuale</small><strong>${mask0(currentTotal)}</strong></div>
+    <div><small>Profitto/Perdita</small><strong class="${plClass(plTotalPct)}">${plSign(plTotalPct)}${hideAmounts?"":" · "+euro2(plTotalAbs)}</strong></div>`;
+  const sorted=[...withInvested].sort((a,b)=>b.plPct-a.plPct);
+  const max=Math.max(...sorted.map(x=>Math.abs(x.plPct)),0.01);
+  cEl.innerHTML=sorted.map(x=>{
+    const w=Math.abs(x.plPct)/max*50;
+    const pos=x.plPct>=0;
+    return `<div class="pl-row"><div class="lbl">${esc(x.name)}</div><div class="divbar"><i style="${pos?"left":"right"}:50%;width:${w}%;background:${pos?"var(--g)":"var(--red)"}"></i></div><div class="val ${plClass(x.plPct)}">${plSign(x.plPct)}</div></div>`;
+  }).join("");
+}
+function renderRank(total,sorted){
+  document.getElementById("rank").innerHTML=sorted.slice(0,5).map((x,i)=>`<div class="rank-row"><div class="rank-num">${String(i+1).padStart(2,"0")}</div><div class="rank-main"><b>${esc(x.name)}</b><div class="line bar"><i style="width:${x.value/total*100}%"></i></div></div><div class="rank-val">${mask2(x.value)}<br><span class="muted">${pct(x.value/total)}${typeof x.plPct==="number"?` &nbsp;·&nbsp; <span class="${plClass(x.plPct)}">${plSign(x.plPct)}</span>`:""}</span></div></div>`).join("");
+}
+function renderStructure(total,vari,fix){
+  const vp=vari/total*100, fp=fix/total*100;
+  document.getElementById("structure").innerHTML=`<div style="height:22px;border-radius:99px;overflow:hidden;display:flex;background:#edf2ef"><div style="width:${vp}%;background:#15956b"></div><div style="width:${fp}%;background:#ff99cc"></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20x"><div><div class="muted"><p style="color: green;">■</p>Variabile</div><b style="font-size:24px">${mask0(vari)}</b><div class="muted">${vp.toFixed(1)}%</div></div><div><div class="muted"><p style="color: rgb(228, 138, 204);">■ </p>Fisso</div><b style="font-size:24px">${mask0(fix)}</b><div class="muted">${fp.toFixed(1)}%</div></div></div>`;
+}
+function groupByType(){
+  const m={}; data.forEach(x=>{m[x.type]= (m[x.type]||0)+x.value}); return Object.entries(m).sort((a,b)=>b[1]-a[1]);
+}
+function renderCategory(total){
+  const arr=groupByType();
+  document.getElementById("category").innerHTML=arr.map(([k,v])=>`<div style="display:grid;grid-template-columns:190px 1fr 100px;gap:12px;align-items:center;margin:12px 0"><span style="font-size:15px">${esc(k)}</span><div class="bar"><i style="width:${v/total*100}%"></i></div><b class="right">${mask2(v)}<br><span class="muted">${pct(v/total)}</span></b></div>`).join("");
+}
+function renderTable(total){
+  const q=(document.getElementById("search")?.value||"").toLowerCase(), f=document.getElementById("filter")?.value||"Tutte";
+  const rows=data.filter(x=>(f==="Tutte"||x.group===f)&&(!q||(`${x.name} ${x.type}`).toLowerCase().includes(q))).sort((a,b)=>b.value-a.value);
+  document.getElementById("tbody").innerHTML=rows.length?rows.map(x=>`<tr><td><div class="name">${esc(x.name)}</div></td><td><div class="sub">${esc(x.type)}</div></td><td><span class="tag ${x.group==="Fisse"?"fixed":""}">${x.group}</span></td><td class="right">${typeof x.invested==="number"?mask2(x.invested):"—"}</td><td class="right"><b>${mask2(x.value)}</b></td><td class="right">${typeof x.plPct==="number"?`<span class="${plClass(x.plPct)}">${plSign(x.plPct)}</span>`:"—"}</td><td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="flex:1"><i style="width:${x.value/total*100}%"></i></div><span class="muted" style="width:45px;text-align:right">${pct(x.value/total)}</span></div></td></tr>`).join(""):`<tr><td colspan="7"><div class="empty">Nessun risultato.</div></td></tr>`;
+}
+function renderAllocation(total){
+  const arr=groupByType().slice(0,8); let acc=0; const stops=[];
+  const fills=["#15956b","#3da982","#72bfa0","#a3d2bd","#c8e1d7","#dcebe5","#b6cfc4","#e5efeb"];
+  arr.forEach(([,v],i)=>{const a=acc,b=acc+v/total*100;stops.push(`${fills[i%fills.length]} ${a}% ${b}%`);acc=b});
+  document.getElementById("donutWrap").innerHTML=`<div class="donut" style="background:conic-gradient(${stops.join(",")})"></div><div class="legend2">${arr.map(([k,v],i)=>`<div><span>● ${esc(k)}</span><b>${pct(v/total)}</b></div>`).join("")}</div>`;
+  const c3=data.slice().sort((a,b)=>b.value-a.value).slice(0,3).reduce((s,x)=>s+x.value,0), c5=data.slice().sort((a,b)=>b.value-a.value).slice(0,5).reduce((s,x)=>s+x.value,0);
+  document.getElementById("concentration").innerHTML=`<div style="margin:25px 0"><div class="muted">Prime 3 posizioni</div><div style="font-size:34px;font-weight:850">${pct(c3/total)}</div><div class="bar"><i style="width:${c3/total*100}%"></i></div></div><div style="margin:25px 0"><div class="muted">Prime 5 posizioni</div><div style="font-size:34px;font-weight:850">${pct(c5/total)}</div><div class="bar"><i style="width:${c5/total*100}%"></i></div></div>`;
+}
+function renderHistory(){
+  const el=document.getElementById("historyChart");
+  if(!snapshots.length){el.innerHTML="<div class='empty'>Lo storico inizierà dal primo aggiornamento.</div>";return}
+  const s=snapshots.slice(-30), max=Math.max(...s.map(x=>x.total)), min=Math.min(...s.map(x=>x.total)), span=Math.max(1,max-min);
+  el.innerHTML=`<div class="history">${s.map(x=>`<div class="hbar" title="${x.date}: ${hideAmounts?"••••":euro2(x.total)}"><i style="height:${20+(x.total-min)/span*80}%"></i></div>`).join("")}</div><div style="display:flex;justify-content:space-between;margin-top:9px"><span class="muted">${s[0].date}</span><b>${mask2(s[s.length-1].total)}</b></div>`;
+}
+document.getElementById("connectBtn").onclick=connect;document.getElementById("chooseBtn").onclick=()=>document.getElementById("fallback").click();document.getElementById("refreshBtn").onclick=manualRefresh;
+document.getElementById("syncUrl").value=sourceUrl;
+document.getElementById("saveUrlBtn").onclick=async()=>{
+  const url=document.getElementById("syncUrl").value.trim();
+  if(!url){toast("Incolla prima un link");return}
+  sourceUrl=url; urlHash=""; localStorage.setItem("pos_url",url);
+  fileHandle=null;
+  const ok=await fetchFromUrl(url,true);
+  if(ok) toast("Link collegato e sincronizzato");
+};
+document.getElementById("toggleAmounts").onclick=()=>{hideAmounts=!hideAmounts;localStorage.setItem("pos_hide",JSON.stringify(hideAmounts));render()};
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.getElementById(b.dataset.view).classList.add("active")});
+document.getElementById("search").addEventListener("input",()=>renderTable(data.reduce((s,x)=>s+x.value,0)));
+document.getElementById("filter").addEventListener("change",()=>renderTable(data.reduce((s,x)=>s+x.value,0)));
+
+// Fallback picker for browsers without File System Access API.
+const fallback=document.createElement("input");fallback.type="file";fallback.accept=".xlsx,.xls,.csv";fallback.id="fallback";fallback.hidden=true;document.body.appendChild(fallback);
+fallback.onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const p=parseWorkbook(ev.target.result);data=p.data;sourceDate=p.date instanceof Date?p.date.toLocaleDateString("it-IT"):new Date(f.lastModified).toLocaleDateString("it-IT");snapshots.push({ts:Date.now(),date:sourceDate,total:data.reduce((s,x)=>s+x.value,0)});snapshots=snapshots.slice(-120);save();render();document.getElementById("fileName").textContent=f.name+" · importato";toast("Excel importato");}catch(err){alert(err.message)}};r.readAsArrayBuffer(f)};
+
+// Best-effort automatic sync: checks the linked file/URL every 30 seconds and on window focus.
+setInterval(()=>{if(fileHandle)readHandle();else if(sourceUrl)fetchFromUrl(sourceUrl,false)},30000);
+window.addEventListener("focus",()=>{if(fileHandle)readHandle();else if(sourceUrl)fetchFromUrl(sourceUrl,false)});
+render();
+if(sourceUrl) fetchFromUrl(sourceUrl,false);
+else if(fileHandle===null) setConnected(false,"Non collegato");
+</script>
+</body>
+</html>
